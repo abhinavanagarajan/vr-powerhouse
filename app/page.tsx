@@ -23,9 +23,9 @@ export default function VRPhysiotherapyGame() {
 
   useEffect(() => {
     // Lock screen orientation to landscape for better VR experience
-    if (screen.orientation && screen.orientation.lock) {
-      screen.orientation.lock('landscape').catch(console.warn);
-    }
+    if (screen.orientation && (screen.orientation as any).lock) {
+      (screen.orientation as any).lock('landscape').catch(console.warn);
+    }    
   }, []);
 
   const handleStartGame = async () => {
