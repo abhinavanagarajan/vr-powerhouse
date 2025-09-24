@@ -1,6 +1,6 @@
 "use client"
 
-import { useRef, useState, useCallback, useMemo } from 'react';
+import { useRef, useState, useCallback, useMemo, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { DeviceOrientationControls, Stars, Environment } from '@react-three/drei';
 import * as THREE from 'three';
@@ -31,6 +31,33 @@ export function GameScene({
     [-2, 0, -5],
     [0, 2, -5]
   ], []);
+
+  useEffect(() => {
+    if (navigator.xr) {
+      navigator.xr.isSessionSupported('immersive-vr').then((supported) => {
+        if (supported) {
+          console.log('VR supported on this device');
+        } else {
+          console.warn('VR not supported on this device');
+        }
+      });
+    }
+  }, []);
+
+  const enterVR = async () => {
+    if (navigator.xr) {
+      try {
+        const session = await navigator.xr.requestSession('immersive-vr');
+        const gl = document.querySelector('canvas').getContext('webgl');
+        await session.updateRenderState({ baseLayer: new XRWebGLLayer(session, gl) });
+        console.log('Entered VR mode');
+      } catch (error) {
+        console.error('Failed to enter VR mode:', error);
+      }
+    } else {
+      alert('WebXR not supported on this device');
+    }
+  };
 
   // Detect shake gesture
   const detectShake = useCallback((motion) => {
@@ -119,6 +146,25 @@ export function GameScene({
 
   return (
     <>
+      {/* VR Button */}
+      <button 
+        onClick={enterVR} 
+        style={{
+          position: 'absolute',
+          top: '10px',
+          right: '10px',
+          zIndex: 1000,
+          padding: '10px 20px',
+          backgroundColor: '#007BFF',
+          color: '#FFF',
+          border: 'none',
+          borderRadius: '5px',
+          cursor: 'pointer'
+        }}
+      >
+        Enter VR
+      </button>
+
       {/* Camera controls for VR */}
       <DeviceOrientationControls ref={controlsRef} />
       
