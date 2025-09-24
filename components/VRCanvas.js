@@ -30,6 +30,9 @@ export function VRCanvas({ children, ...props }) {
         gl.setPixelRatio(Math.min(window.devicePixelRatio, 2));
         gl.shadowMap.enabled = true;
         gl.shadowMap.type = 5; // PCF shadows
+
+        // Enable WebXR support
+        gl.xr.enabled = true;
       }}
       {...props}
     >
