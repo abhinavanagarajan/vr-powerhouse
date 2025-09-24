@@ -38,15 +38,15 @@ export default function VRPhysiotherapyGame() {
     }
   };
 
-  const handleScoreChange = (newScore) => {
+  const handleScoreChange = (newScore: number) => {
     setGameStats(prev => ({ ...prev, score: newScore }));
   };
 
-  const handleRepetitionComplete = (reps) => {
+  const handleRepetitionComplete = (reps: any) => {
     console.log(`Repetition ${reps} completed`);
   };
 
-  const handleGameComplete = (finalScore) => {
+  const handleGameComplete = (finalScore: any) => {
     setGameStats(prev => ({
       score: finalScore,
       completedSessions: prev.completedSessions + 1
