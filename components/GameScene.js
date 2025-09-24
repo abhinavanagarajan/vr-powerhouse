@@ -59,6 +59,18 @@ export function GameScene({
     }
   };
 
+  useEffect(() => {
+    const canvas = document.querySelector('canvas');
+    const handleContextLost = (event) => {
+      event.preventDefault();
+      console.error('WebGL context lost. Please reload the page.');
+    };
+    canvas.addEventListener('webglcontextlost', handleContextLost);
+    return () => {
+      canvas.removeEventListener('webglcontextlost', handleContextLost);
+    };
+  }, []);
+
   // Detect shake gesture
   const detectShake = useCallback((motion) => {
     const acceleration = motion.accelerationIncludingGravity;
@@ -147,75 +159,76 @@ export function GameScene({
   return (
     <>
       {/* VR Button */}
-      <button 
-        onClick={enterVR} 
-        style={{
-          position: 'absolute',
-          top: '10px',
-          right: '10px',
-          zIndex: 1000,
-          padding: '10px 20px',
-          backgroundColor: '#007BFF',
-          color: '#FFF',
-          border: 'none',
-          borderRadius: '5px',
-          cursor: 'pointer'
-        }}
-      >
-        Enter VR
-      </button>
+      <div style={{ position: 'absolute', top: '10px', right: '10px', zIndex: 1000 }}>
+        <button 
+          onClick={enterVR} 
+          style={{
+            padding: '10px 20px',
+            backgroundColor: '#007BFF',
+            color: '#FFF',
+            border: 'none',
+            borderRadius: '5px',
+            cursor: 'pointer'
+          }}
+        >
+          Enter VR
+        </button>
+      </div>
 
-      {/* Camera controls for VR */}
-      <DeviceOrientationControls ref={controlsRef} />
-      
-      {/* Lighting */}
-      <ambientLight intensity={0.4} />
-      <pointLight position={[10, 10, 10]} intensity={1} />
-      <spotLight
-        position={[0, 10, 0]}
-        angle={0.3}
-        penumbra={1}
-        intensity={0.5}
-        castShadow
-      />
-      
-      {/* Environment */}
-      <Environment preset="night" />
-      <Stars radius={100} depth={50} count={5000} factor={4} saturation={0} />
-      
-      {/* Target object */}
-      {gameState === 'playing' && (
-        <TargetObject
-          position={exercisePath[currentTarget]}
-          proximity={accuracy}
-          isActive={true}
-          targetSize={0.5}
+      {/* R3F Canvas */}
+      <>
+        {/* Camera controls for VR */}
+        <DeviceOrientationControls ref={controlsRef} />
+        
+        {/* Lighting */}
+        <ambientLight intensity={0.4} />
+        <pointLight position={[10, 10, 10]} intensity={1} />
+        <spotLight
+          position={[0, 10, 0]}
+          angle={0.3}
+          penumbra={1}
+          intensity={0.5}
+          castShadow
         />
-      )}
-      
-      {/* Exercise path visualization */}
-      {gameState === 'playing' && exercisePath.map((position, index) => (
-        <mesh key={index} position={position}>
-          <sphereGeometry args={[0.1, 8, 8]} />
-          <meshBasicMaterial 
-            color={index === currentTarget ? "#ffff00" : "#666666"} 
-            transparent 
-            opacity={index === currentTarget ? 1 : 0.3}
+        
+        {/* Environment */}
+        <Environment preset="night" />
+        <Stars radius={100} depth={50} count={5000} factor={4} saturation={0} />
+        
+        {/* Target object */}
+        {gameState === 'playing' && (
+          <TargetObject
+            position={exercisePath[currentTarget]}
+            proximity={accuracy}
+            isActive={true}
+            targetSize={0.5}
           />
-        </mesh>
-      ))}
-      
-      {/* Game UI */}
-      <GameUI
-        score={score}
-        repetitions={repetitions}
-        targetReps={targetReps}
-        accuracy={accuracy}
-        gameState={gameState}
-      />
-      
-      {/* Background grid for spatial reference */}
-      <gridHelper args={[20, 20, "#333333", "#111111"]} position={[0, -5, 0]} />
+        )}
+        
+        {/* Exercise path visualization */}
+        {gameState === 'playing' && exercisePath.map((position, index) => (
+          <mesh key={index} position={position}>
+            <sphereGeometry args={[0.1, 8, 8]} />
+            <meshBasicMaterial 
+              color={index === currentTarget ? "#ffff00" : "#666666"} 
+              transparent 
+              opacity={index === currentTarget ? 1 : 0.3}
+            />
+          </mesh>
+        ))}
+        
+        {/* Game UI */}
+        <GameUI
+          score={score}
+          repetitions={repetitions}
+          targetReps={targetReps}
+          accuracy={accuracy}
+          gameState={gameState}
+        />
+        
+        {/* Background grid for spatial reference */}
+        <gridHelper args={[20, 20, "#333333", "#111111"]} position={[0, -5, 0]} />
+      </>
     </>
   );
 }
